@@ -1,11 +1,7 @@
-#include <stdio.h>
+#include "shell.h"
 /**
- * main - Entry point
+ * shell_proj - 
  *
- * Return: Always 0
+ *
  */
-int main(void)
-{
-Printf("Hello Simple Shell!");
-	return (0);
-}
+
