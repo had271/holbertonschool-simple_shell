@@ -1,10 +1,10 @@
-#include <stdio.h>
+#include "shell.h"
 /**
- * main - Entry point
+ * BettBett - Entry point
  *
- * Return: calling function
+ * Return: Always 0
  */
-int main(void)
+int BettBett(void)
 {
-	return (shell_proj());
+	return (0);
 }

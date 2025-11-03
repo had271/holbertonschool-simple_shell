@@ -1,9 +1,9 @@
 #include "shell.h"
 /**
- * shell_proj - UNIX command line interpreter
+ * main - UNIX command line interpreter
  * Return: always 0
  */
-int shell_proj(void)
+int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;

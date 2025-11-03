@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <dirent.h>
-int shell_proj (void);
+int main (void);
+int BettBett (void);
 extern char **environ;
 #endif
