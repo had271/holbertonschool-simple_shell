@@ -2,10 +2,9 @@
 /**
  * main - Entry point
  *
- * Return: Always 0
+ * Return: calling function
  */
 int main(void)
 {
-	printf("Hello Simple Shell!");
-	return (0);
+	return (shell_proj());
 }

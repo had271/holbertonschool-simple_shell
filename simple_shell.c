@@ -11,6 +11,7 @@ int shell_proj(void)
 
 	while (1)
 	{
+	if (isatty(STDIN_FILENO))
 	printf("#cisfun$ ");
 	if (getline(&line, &len, stdin) == -1)
 	break;
@@ -25,7 +26,7 @@ int shell_proj(void)
 
 	argv[0] = line;
 	argv[1] = NULL;
-	execve(line, argv, NULL);
+	execve(line, argv, environ);
 	perror(line);
 	exit(1);
 	}
