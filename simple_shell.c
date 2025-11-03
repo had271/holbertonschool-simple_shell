@@ -21,8 +21,10 @@ int shell_proj(void)
 	pid = fork();
 	if (pid == 0)
 	{
-	char *argv[] = {line, NULL};
+	char *argv[2];
 
+	argv[0] = line;
+	argv[1] = NULL;
 	execve(line, argv, NULL);
 	perror(line);
 	exit(1);

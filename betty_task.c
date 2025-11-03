@@ -6,6 +6,6 @@
  */
 int main(void)
 {
-Printf("Hello Simple Shell!");
+	printf("Hello Simple Shell!");
 	return (0);
 }
