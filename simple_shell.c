@@ -14,7 +14,6 @@ return (EXIT_SUCCESS);
 void shell_loop(void)
 {
 char *line;
-	char *args;
 	int status;
 
 	do {
@@ -26,7 +25,7 @@ char *line;
 	continue;
 	}
 	line[strcspn(line, "\n")] = '\0';
-	status = shell_execute(args);
+	status = shell_execute(line);
 
 	free(line);
 	} while (status);
@@ -66,11 +65,13 @@ int shell_execute(char *line)
 
 	if (pid == 0)
 	{
-	char *argv[] = {line, NULL};
+		char *argv[2];
 
-	execve(line, argv, environ);
-	perror(line);
-	exit(EXIT_FAILURE);
+		argv[0] = line;
+		argv[1] = NULL;
+		execve(line, argv, environ);
+		perror(line);
+		exit(EXIT_FAILURE);
 	}
 	else if (pid < 0)
 	{
@@ -81,5 +82,5 @@ int shell_execute(char *line)
 	wait(NULL);
 	}
 
-	return (0);
+	return (-1);
 }
