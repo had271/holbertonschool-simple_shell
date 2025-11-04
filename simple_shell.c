@@ -17,14 +17,16 @@ char *line;
 	int status;
 
 	do {
+	if (isatty(STDIN_FILENO))
 	printf("#cisfun$ ");
 	line = shell_read_line();
-	if (line[0] == '\n')
+	if (line[0] == '\n' || strspn(line, " \t\r\n") == strlen(line))
 	{
 	free(line);
 	continue;
 	}
 	line[strcspn(line, "\n")] = '\0';
+	line[strcspn(line, "\t")] = '\0';
 	status = shell_execute(line);
 
 	free(line);
@@ -40,8 +42,6 @@ char *shell_read_line(void)
 	size_t bufsize = 0;
 
 	if (getline(&line, &bufsize, stdin) == -1)
-	{
-	if (feof(stdin))
 	{
 	exit(EXIT_SUCCESS);
 	}
