@@ -50,8 +50,6 @@ char *shell_read_line(void)
 	perror("readline");
 	exit(EXIT_FAILURE);
 	}
-	}
-
 	return (line);
 }
 /**
