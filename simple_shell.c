@@ -10,12 +10,11 @@ return (EXIT_SUCCESS);
 }
 /**
 	* shell_loop - loop function
-	* Return: always 0
 	*/
-int shell_loop(void)
+void shell_loop(void)
 {
 char *line;
-	char **args;
+	char *args;
 	int status;
 
 	do {
@@ -31,7 +30,6 @@ char *line;
 
 	free(line);
 	} while (status);
-	return (0);
 }
 /**
 	* shell_read_line - read function
@@ -40,7 +38,7 @@ char *line;
 char *shell_read_line(void)
 {
 	char *line = NULL;
-	ssize_t bufsize = 0;
+	size_t bufsize = 0;
 
 	if (getline(&line, &bufsize, stdin) == -1)
 	{
