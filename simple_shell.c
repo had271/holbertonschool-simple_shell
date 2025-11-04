@@ -5,34 +5,72 @@
  */
 int main(void)
 {
-	char *line = NULL;
-	size_t len = 0;
-	pid_t pid;
+shell_loop();
+return EXIT_SUCCESS;
+}
+/**
+ * shell_loop - loop function
+ * Return: always 0
+ */
+int shell_loop(void)
+{
+char *line;
+  char **args;
+  int status;
 
-	while (1)
-	{
-	if (isatty(STDIN_FILENO))
-	printf("#cisfun$ ");
-	if (getline(&line, &len, stdin) == -1)
-	break;
+  do {
+    printf("#cisfun$ ");
+    line = shell_read_line();
+        if (line[0] == '\n') {
+      free(line);
+      continue;
+    }
+    line[strcspn(line, "\n")] = '\0';
+    status = shell_execute(args);
 
-	if (line[0] == '\n')
-	continue;
-	line[strcspn(line, "\n")] = '\0';
-	pid = fork();
-	if (pid == 0)
-	{
-	char *argv[2];
+    free(line);
+  } while (status);
+  return (0);
+}
+/**
+ * shell_read_line - read function
+ * Return: line
+ */
+char *shell_read_line(void)
+{
+  char *line = NULL;
+  ssize_t bufsize = 0;
 
-	argv[0] = line;
-	argv[1] = NULL;
-	execve(line, argv, environ);
-	perror(line);
-	exit(1);
-	}
-	else
-	wait(NULL);
-	}
-	free(line);
-	return (0);
+  if (getline(&line, &bufsize, stdin) == -1){
+    if (feof(stdin)) {
+      exit(EXIT_SUCCESS);
+    } else  {
+      perror("readline");
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  return (line);
+}
+/**
+ * shell_execute - execute function
+ * Return: 1
+ */
+int shell_execute(char *line)
+{
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    char *argv[] = {line, NULL};
+
+    execve(line, argv, environ);
+    perror(line);
+    exit(EXIT_FAILURE);
+  } else if (pid < 0) {
+    perror("fork");
+  } else {
+    wait(NULL);
+  }
+
+  return (1);
 }
