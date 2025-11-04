@@ -14,6 +14,6 @@ int main(void);
 int BettBett(void);
 void shell_loop(void);
 char *shell_read_line(void);
-int shell_execute(char **line);
+int shell_execute(char *line);
 extern char **environ;
 #endif
