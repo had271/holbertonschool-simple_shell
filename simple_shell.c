@@ -1,84 +1,164 @@
-#include "shell.h"
+#include "main.h"
+
 /**
-	* main - UNIX command line interpreter
-	* Return: always 0
-	*/
+ * main - open shell, project base
+ * Return: int
+ */
+
 int main(void)
 {
-shell_loop();
-return (EXIT_SUCCESS);
+	char *buff = NULL, **args;
+	size_t read_size = 0;
+	ssize_t buff_size = 0;
+	int exit_status = 0;
+
+	while (1)
+	{
+		if (isatty(0))
+			printf("hsh$ ");
+
+		buff_size = getline(&buff, &read_size, stdin);
+		if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
+		{
+			free(buff);
+			break;
+		}
+		buff[buff_size - 1] = '\0';
+
+		if (_strcmp("env", buff) == 0)
+		{
+			_env();
+			continue;
+		}
+
+		if (empty_line(buff) == 1)
+		{
+			exit_status = 0;
+			continue;
+		}
+
+		args = _split(buff, " ");
+		args[0] = search_path(args[0]);
+
+		if (args[0] != NULL)
+			exit_status = execute(args);
+		else
+			perror("Error");
+		free(args);
+	}
+	return (exit_status);
 }
+
 /**
-	* shell_loop - loop function
-	*/
-void shell_loop(void)
+ * search_path - search file between the path
+ * @command: cmd
+ * Return: cmd path
+ */
+char *search_path(char *command)
 {
-char *line;
+	char *path = _getenv("PATH"), *path_cpy;
+	char **path_split;
+	char *path_concat = NULL;
+	int i = 0, path_len = 0;
+	struct stat info;
+
+	if (stat(command, &info) == 0)
+		return (command);
+
+	path_cpy = malloc(_strlen(path) + 0);
+
+	path_cpy = _strcpy(path_cpy, path);
+	path_split = _split(path_cpy, ":");
+
+	while (path_split[i])
+	{
+		path_len = _strlen(path_split[i]);
+
+		if (path_split[i][path_len - 1] != '/')
+			path_concat = _strcat(path_split[i], "/");
+
+		path_concat = _strcat(path_split[i], command);
+
+		if (stat(path_concat, &info) == 0)
+			break;
+
+		i++;
+	}
+
+	free(path_cpy);
+
+	if (!path_split[i])
+	{
+		free(path_split);
+		return (NULL);
+	}
+
+	free(path_split);
+	return (path_concat);
+}
+
+/**
+ * execute - execute command path, child process
+ * @args: arguments
+ * Return: exit status
+ */
+
+int execute(char **args)
+{
+	int id = fork(), status;
+
+	if (id == 0)
+	{
+		if (execve(args[0], args, environ) == -1)
+			perror("Error");
+	}
+	else
+	{
+		wait(&status);
+		if (WIFEXITED(status))
+			status = WEXITSTATUS(status);
+	}
+
+	return (status);
+}
+
+/**
+ * _getenv - get env variables
+ * @env_var: env variable
+ * Return: env variable result, its content
+ */
+
+char *_getenv(char *env_var)
+{
+	int i = 0, j;
 	int status;
 
-	do {
-	if (isatty(STDIN_FILENO))
-	printf("#cisfun$ ");
-	line = shell_read_line();
-	if (line[0] == '\n' || strspn(line, " \t\r\n") == strlen(line))
+	while (environ[i])
 	{
-	free(line);
-	continue;
-	}
-	line[strcspn(line, "\n")] = '\0';
-	line[strcspn(line, "\t")] = '\0';
-	status = shell_execute(line);
+		status = 1;
 
-	free(line);
-	} while (status);
+		for (j = 0; environ[i][j] != '='; j++)
+		{
+			if (environ[i][j] != env_var[j])
+				status = 0;
+		}
+		if (status == 1)
+			break;
+		i++;
+	}
+	return (&environ[i][j + 1]);
 }
+
 /**
-	* shell_read_line - read function
-	* Return: line
-	*/
-char *shell_read_line(void)
+ * _env - prints environment
+*/
+void _env(void)
 {
-	char *line = NULL;
-	size_t bufsize = 0;
+	int i = 0;
 
-	if (getline(&line, &bufsize, stdin) == -1)
+	while (environ[i])
 	{
-	exit(EXIT_SUCCESS);
+		printf("%s\n", environ[i]);
+		i++;
 	}
-	else
-	{
-	perror("readline");
-	exit(EXIT_FAILURE);
-	}
-	return (line);
-}
-/**
-	* shell_execute - execute function
-	* @line: argument
-	* Return: 1
-	*/
-int shell_execute(char *line)
-{
-	pid_t pid = fork();
-
-	if (pid == 0)
-	{
-		char *argv[2];
-
-		argv[0] = line;
-		argv[1] = NULL;
-		execve(line, argv, environ);
-		perror(line);
-		exit(EXIT_FAILURE);
-	}
-	else if (pid < 0)
-	{
-	perror("fork");
-	}
-	else
-	{
-	wait(NULL);
-	}
-
-	return (-1);
 }
