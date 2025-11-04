@@ -14,7 +14,7 @@ return (EXIT_SUCCESS);
 void shell_loop(void)
 {
 char *line;
-	char *args;
+	char **args;
 	int status;
 
 	do {
@@ -60,7 +60,7 @@ char *shell_read_line(void)
 	* @line: argument
 	* Return: 1
 	*/
-int shell_execute(char *line)
+int shell_execute(char **line)
 {
 	pid_t pid = fork();
 
