@@ -23,4 +23,5 @@ void _env(void);
 int execute(char **args);
 int empty_line(char *buff);
 extern char **environ;
+void *_calloc(unsigned int nmemb, unsigned int size);
 #endif
