@@ -66,7 +66,7 @@ int shell_execute(char *line)
 
 	if (pid == 0)
 	{
-	char **argv[] = {line, NULL};
+	char *argv[] = {line, NULL};
 
 	execve(line, argv, environ);
 	perror(line);
