@@ -10,8 +10,8 @@
 #include <signal.h>
 #include <errno.h>
 #include <dirent.h>
-int main (void);
-int BettBett (void);
+int main(void);
+int BettBett(void);
 void shell_loop(void);
 char *shell_read_line(void);
 int shell_execute(char *line);
