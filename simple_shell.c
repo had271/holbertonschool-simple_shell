@@ -53,70 +53,52 @@ int main(void)
 }
 
 /**
-	* search_path - search file between the path
-	* @command: cmd
-	* Return: cmd path
-	*/
-char *search_path(char *command)
+ * split_path - function to split env variable PATH into tokens
+ * @path: pointer holding PATH
+ * Return: Pointer to an array of strings holding the tokens
+*/
+char **split_path(char *path)
 {
-	char *path = _getenv("PATH"), *path_cpy;
-	char **path_split;
-	char *path_concat = NULL;
-	int i = 0, path_len = 0;
-	struct stat info;
+	unsigned int i;
+	char *tok = NULL, **dir;
+	size_t dir_size = 32;
 
-	if (stat(command, &info) == 0)
-	return (command);
-
-	path_cpy = malloc(_strlen(path) + 0);
-
-	path_cpy = _strcpy(path_cpy, path);
-	path_split = _split(path_cpy, ":");
-
-	while (path_split[i])
-{
-	path_len = _strlen(path_split[i]);
-
-	if (path_split[i][path_len - 1] != '/')
+	dir = malloc(sizeof(char *) * dir_size);
+	if (dir == NULL)
 	{
-	path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 2);
-	if (!path_concat)
-	return (NULL);
-
-	_strcpy(path_concat, path_split[i]);
-	_strcat(path_concat, "/");
-	_strcat(path_concat, command);
-	}
-	else
+		perror("split_path: failed to allocate dir\n");
+		exit(EXIT_FAILURE);
+	} tok = strtok(path, "= :");
+	tok = strtok(NULL, "= :");
+	if (tok == NULL)
 	{
-	path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 1);
-	if (!path_concat)
-	return (NULL);
-
-	_strcpy(path_concat, path_split[i]);
-	_strcat(path_concat, command);
-	}
-
-	if (stat(path_concat, &info) == 0)
+		free(dir);
+		perror("Please enter a path\n");
+		exit(EXIT_FAILURE);
+	} else
 	{
-	break;
-	}
-
-	free(path_concat);
-	path_concat = NULL;
-	i++;
-}
-
-free(path_cpy);
-
-if (!path_split[i])
-{
-	free(path_split);
-	return (NULL);
-}
-
-free(path_split);
-return (path_concat);
+		i = 0;
+		while (tok != NULL)
+		{
+			dir[i] = malloc(sizeof(char) * (_strlen(tok) + 2));
+			if (dir[i] == NULL)
+			{
+				free(dir);
+				perror("hsh: failed to allocate dir[i]\n");
+				exit(EXIT_FAILURE);
+			} _strcpy(dir[i], tok);
+			_strcat(dir[i], "/");
+			tok = strtok(NULL, "= :");
+			i++;
+			if (i >= dir_size)
+			{
+				dir_size += 32;
+				dir = _realloc(dir, dir_size, dir_size * sizeof(char *));
+				if (dir == NULL)
+				perror("hsh: failed to reallocate dir\n");
+			}
+		} dir[i] = NULL;
+	} return (dir);
 }
 
 /**
