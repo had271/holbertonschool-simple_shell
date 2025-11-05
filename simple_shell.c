@@ -54,7 +54,7 @@ int main(void)
 		allocated = 1;
 	if (allocated)
 		free(args[0]);
-	ree(args);
+	free(args);
 	}
 	free(buff);
 	return (exit_status);
