@@ -1,9 +1,9 @@
 #include "main.h"
 
 /**
- * main - open shell, project base
- * Return: int
- */
+	* main - open shell, project base
+	* Return: int
+	*/
 
 int main(void)
 {
@@ -14,49 +14,49 @@ int main(void)
 
 	while (1)
 	{
-		if (isatty(0))
-			printf("hsh$ ");
+	if (isatty(0))
+	printf("hsh$ ");
 
-		buff_size = getline(&buff, &read_size, stdin);
-		if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
-		{
-			free(buff);
-			break;
-		}
-		buff[buff_size - 1] = '\0';
+	buff_size = getline(&buff, &read_size, stdin);
+	if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
+	{
+	free(buff);
+	break;
+	}
+	buff[buff_size - 1] = '\0';
 
-		if (_strcmp("env", buff) == 0)
-		{
-			_env();
-			continue;
-		}
+	if (_strcmp("env", buff) == 0)
+	{
+	_env();
+	continue;
+	}
 
-		if (empty_line(buff) == 1)
-		{
-			exit_status = 0;
-			continue;
-		}
+	if (empty_line(buff) == 1)
+	{
+	exit_status = 0;
+	continue;
+	}
 
-		args = _split(buff, " ");
-		args[0] = search_path(args[0]);
+	args = _split(buff, " ");
+	args[0] = search_path(args[0]);
 
-		if (args[0] != NULL)
-			exit_status = execute(args);
-		else
-		{
-			perror("Error");
-			free(args);
-			continue;
-		}
+	if (args[0] != NULL)
+	exit_status = execute(args);
+	else
+	{
+	perror("Error");
+	free(args);
+	continue;
+	}
 	}
 	return (exit_status);
 }
 
 /**
- * search_path - search file between the path
- * @command: cmd
- * Return: cmd path
- */
+	* search_path - search file between the path
+	* @command: cmd
+	* Return: cmd path
+	*/
 char *search_path(char *command)
 {
 	char *path = _getenv("PATH"), *path_cpy;
@@ -66,7 +66,7 @@ char *search_path(char *command)
 	struct stat info;
 
 	if (stat(command, &info) == 0)
-		return (command);
+	return (command);
 
 	path_cpy = malloc(_strlen(path) + 0);
 
@@ -75,44 +75,44 @@ char *search_path(char *command)
 
 	while (path_split[i])
 {
-        path_len = _strlen(path_split[i]);
+	path_len = _strlen(path_split[i]);
 
-        if (path_split[i][path_len - 1] != '/')
-        {
-                path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 2);
-                if (!path_concat)
-                        return (NULL);
+	if (path_split[i][path_len - 1] != '/')
+	{
+	path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 2);
+	if (!path_concat)
+	return (NULL);
 
-                _strcpy(path_concat, path_split[i]);
-                _strcat(path_concat, "/");
-                _strcat(path_concat, command);
-        }
-        else
-        {
-                path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 1);
-                if (!path_concat)
-                        return (NULL);
+	_strcpy(path_concat, path_split[i]);
+	_strcat(path_concat, "/");
+	_strcat(path_concat, command);
+	}
+	else
+	{
+	path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 1);
+	if (!path_concat)
+	return (NULL);
 
-                _strcpy(path_concat, path_split[i]);
-                _strcat(path_concat, command);
-        }
+	_strcpy(path_concat, path_split[i]);
+	_strcat(path_concat, command);
+	}
 
-        if (stat(path_concat, &info) == 0)
-        {
-                break;
-        }
+	if (stat(path_concat, &info) == 0)
+	{
+	break;
+	}
 
-        free(path_concat);
-        path_concat = NULL;
-        i++;
+	free(path_concat);
+	path_concat = NULL;
+	i++;
 }
 
 free(path_cpy);
 
 if (!path_split[i])
 {
-        free(path_split);
-        return (NULL);
+	free(path_split);
+	return (NULL);
 }
 
 free(path_split);
@@ -120,10 +120,10 @@ return (path_concat);
 }
 
 /**
- * execute - execute command path, child process
- * @args: arguments
- * Return: exit status
- */
+	* execute - execute command path, child process
+	* @args: arguments
+	* Return: exit status
+	*/
 
 int execute(char **args)
 {
@@ -131,24 +131,24 @@ int execute(char **args)
 
 	if (id == 0)
 	{
-		if (execve(args[0], args, environ) == -1)
-			perror("Error");
+	if (execve(args[0], args, environ) == -1)
+	perror("Error");
 	}
 	else
 	{
-		wait(&status);
-		if (WIFEXITED(status))
-			status = WEXITSTATUS(status);
+	wait(&status);
+	if (WIFEXITED(status))
+	status = WEXITSTATUS(status);
 	}
 
 	return (status);
 }
 
 /**
- * _getenv - get env variables
- * @env_var: env variable
- * Return: env variable result, its content
- */
+	* _getenv - get env variables
+	* @env_var: env variable
+	* Return: env variable result, its content
+	*/
 
 char *_getenv(char *env_var)
 {
@@ -157,22 +157,22 @@ char *_getenv(char *env_var)
 
 	while (environ[i])
 	{
-		status = 1;
+	status = 1;
 
-		for (j = 0; environ[i][j] != '='; j++)
-		{
-			if (environ[i][j] != env_var[j])
-				status = 0;
-		}
-		if (status == 1)
-			break;
-		i++;
+	for (j = 0; environ[i][j] != '='; j++)
+	{
+	if (environ[i][j] != env_var[j])
+	status = 0;
+	}
+	if (status == 1)
+	break;
+	i++;
 	}
 	return (&environ[i][j + 1]);
 }
 
 /**
- * _env - prints environment
+	* _env - prints environment
 */
 void _env(void)
 {
@@ -180,7 +180,7 @@ void _env(void)
 
 	while (environ[i])
 	{
-		printf("%s\n", environ[i]);
-		i++;
+	printf("%s\n", environ[i]);
+	i++;
 	}
 }
