@@ -74,35 +74,49 @@ char *search_path(char *command)
 	path_split = _split(path_cpy, ":");
 
 	while (path_split[i])
-	{
-		path_len = _strlen(path_split[i]);
-
-		if (path_split[i][path_len - 1] != '/')
-		{
-			path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 2);
-			if (!path_concat)
-				return (NULL);
-			_strcpy(path_concat, path_split[i]);
-			_strcat(path_concat, "/");
-			_strcat(path_concat, command);
-		}
-	if (stat(path_concat, &info) == 0)
 {
-		break;
+        path_len = _strlen(path_split[i]);
+
+        if (path_split[i][path_len - 1] != '/')
+        {
+                path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 2);
+                if (!path_concat)
+                        return (NULL);
+
+                _strcpy(path_concat, path_split[i]);
+                _strcat(path_concat, "/");
+                _strcat(path_concat, command);
+        }
+        else
+        {
+                path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 1);
+                if (!path_concat)
+                        return (NULL);
+
+                _strcpy(path_concat, path_split[i]);
+                _strcat(path_concat, command);
+        }
+
+        if (stat(path_concat, &info) == 0)
+        {
+                break;
+        }
+
+        free(path_concat);
+        path_concat = NULL;
+        i++;
 }
-	i++;
-	}
 
-	free(path_cpy);
+free(path_cpy);
 
-	if (!path_split[i])
-	{
-		free(path_split);
-		return (NULL);
-	}
+if (!path_split[i])
+{
+        free(path_split);
+        return (NULL);
+}
 
-	free(path_split);
-	return (path_concat);
+free(path_split);
+return (path_concat);
 }
 
 /**
