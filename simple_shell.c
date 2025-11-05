@@ -20,8 +20,7 @@ int main(void)
 	buff_size = getline(&buff, &read_size, stdin);
 	if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
 	{
-	free(buff);
-	return (exit_status);
+		break;
 	}
 
 	buff[buff_size - 1] = '\0';
@@ -49,7 +48,8 @@ int main(void)
 	}
 
 	exit_status = execute(args);
-	free(args[0]); 
+	if (args[0] != buff)
+		free(args[0]); 
 	free(args);
 	}
 	free(buff);
