@@ -63,43 +63,43 @@ char *search_path(char *command)
 	struct stat info;
 
 	if (stat(command, &info) == 0)
-		return (command);
+	return (command);
 
 	if (!path)
-		return (NULL);
+	return (NULL);
 
 	path_cpy = malloc(_strlen(path) + 1);
 	if (!path_cpy)
-		return (NULL);
+	return (NULL);
 
 	_strcpy(path_cpy, path);
 	path_split = _split(path_cpy, ":");
 	if (!path_split)
 	{
-		free(path_cpy);
-		return (NULL);
+	free(path_cpy);
+	return (NULL);
 	}
 
 	while (path_split[i])
 	{
-		path_len = _strlen(path_split[i]);
-		path_concat = malloc(path_len + _strlen(command) + 2);
-		if (!path_concat)
-		{
-			i++;
-			continue;
-		}
+	path_len = _strlen(path_split[i]);
+	path_concat = malloc(path_len + _strlen(command) + 2);
+	if (!path_concat)
+	{
+	i++;
+	continue;
+	}
 
-		_strcpy(path_concat, path_split[i]);
-		_strcat(path_concat, "/");
-		_strcat(path_concat, command);
+	_strcpy(path_concat, path_split[i]);
+	_strcat(path_concat, "/");
+	_strcat(path_concat, command);
 
-		if (stat(path_concat, &info) == 0)
-			break;
+	if (stat(path_concat, &info) == 0)
+	break;
 
-		free(path_concat);
-		path_concat = NULL;
-		i++;
+	free(path_concat);
+	path_concat = NULL;
+	i++;
 	}
 
 	free(path_cpy);
