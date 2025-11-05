@@ -43,12 +43,13 @@ int main(void)
 		if (args[0] != NULL)
 			exit_status = execute(args);
 		else
+		{
 			perror("./hsh");
 			free(args);
 			continue;
+		}
 	}
-	exit_status = execute(args);
-	free(args);
+	return (exit_status);
 }
 
 /**
@@ -94,8 +95,10 @@ char *search_path(char *command)
 	_strcat(path_concat, command);
 }
 	if (stat(path_concat, &info) == 0)
+{
 		break;
-		i++;
+}
+	i++;
 	}
 
 	free(path_cpy);
