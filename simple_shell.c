@@ -11,6 +11,8 @@ int main(void)
 	size_t read_size = 0;
 	ssize_t buff_size = 0;
 	int exit_status = 0;
+	char *orig0 = args[0];
+	int allocated = 0;
 
 	while (1)
 	{
@@ -38,9 +40,6 @@ int main(void)
 	}
 
 	args = _split(buff, " ");
-		char *orig0 = args[0];
-		int allocated = 0;
-
 	args[0] = search_path(args[0]);
 	if (args[0] == NULL)
 	{
