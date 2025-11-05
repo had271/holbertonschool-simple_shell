@@ -77,7 +77,8 @@ char **split_path(char *path)
 	free(dir);
 	perror("Please enter a path\n");
 	exit(EXIT_FAILURE);
-	} else
+	}
+	else
 	{
 	i = 0;
 	while (tok != NULL)
