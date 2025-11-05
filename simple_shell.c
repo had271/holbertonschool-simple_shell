@@ -51,6 +51,7 @@ int main(void)
 	exit_status = execute(args);
 	free(args);
 	}
+	free(buff);
 	return (exit_status);
 }
 
