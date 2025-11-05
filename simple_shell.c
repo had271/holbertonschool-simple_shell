@@ -38,8 +38,9 @@ int main(void)
 	}
 
 	args = _split(buff, " ");
-	args[0] = search_path(args[0]);
+		char *orig0 = args[0];
 
+	args[0] = search_path(args[0]);
 	if (args[0] == NULL)
 	{
 	perror("./hsh");
@@ -48,7 +49,7 @@ int main(void)
 	}
 
 	exit_status = execute(args);
-	if (args[0] != buff)
+	if (args[0] != orig0)
 		free(args[0]); 
 	free(args);
 	}
