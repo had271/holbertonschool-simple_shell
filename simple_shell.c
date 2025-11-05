@@ -39,6 +39,7 @@ int main(void)
 
 	args = _split(buff, " ");
 		char *orig0 = args[0];
+		int allocated = 0;
 
 	args[0] = search_path(args[0]);
 	if (args[0] == NULL)
@@ -50,8 +51,10 @@ int main(void)
 
 	exit_status = execute(args);
 	if (args[0] != orig0)
-		free(args[0]); 
-	free(args);
+		allocated = 1;
+	if (allocated)
+		free(args[0]);
+	ree(args);
 	}
 	free(buff);
 	return (exit_status);
