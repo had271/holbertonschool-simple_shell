@@ -14,42 +14,42 @@ int main(void)
 
 	while (1)
 	{
-	if (isatty(0))
-	printf("hsh$ ");
+		if (isatty(0))
+			printf("hsh$ ");
 
-	buff_size = getline(&buff, &read_size, stdin);
-	if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
-	{
-	free(buff);
-	return (exit_status);
-	}
+		buff_size = getline(&buff, &read_size, stdin);
+		if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
+		{
+			free(buff);
+			return (exit_status);
+		}
 
-	buff[buff_size - 1] = '\0';
+		buff[buff_size - 1] = '\0';
 
-	if (_strcmp("env", buff) == 0)
-	{
-	_env();
-	continue;
-	}
+		if (_strcmp("env", buff) == 0)
+		{
+			_env();
+			continue;
+		}
 
-	if (empty_line(buff) == 1)
-	{
-	exit_status = 0;
-	continue;
-	}
+		if (empty_line(buff) == 1)
+		{
+			exit_status = 0;
+			continue;
+		}
 
-	args = _split(buff, " ");
-	args[0] = search_path(args[0]);
+		args = _split(buff, " ");
+		args[0] = search_path(args[0]);
 
-	if (args[0] == NULL)
-	{
-	perror("./hsh");
-	free(args);
-	continue;
-	}
+		if (args[0] == NULL)
+		{
+			perror("./hsh");
+			free(args);
+			continue;
+		}
 
-	exit_status = execute(args);
-	free(args);
+		exit_status = execute(args);
+		free(args);
 	}
 	return (exit_status);
 }
