@@ -7,11 +7,10 @@
 
 int main(void)
 {
-	char *buff = NULL, **args;
+	char *buff = NULL, **args, *orig0;
 	size_t read_size = 0;
 	ssize_t buff_size = 0;
 	int exit_status = 0;
-	char *orig0 = args[0];
 	int allocated = 0;
 
 	while (1)
@@ -38,8 +37,8 @@ int main(void)
 	exit_status = 0;
 	continue;
 	}
-
 	args = _split(buff, " ");
+	orig0 = args[0];
 	args[0] = search_path(args[0]);
 	if (args[0] == NULL)
 	{
