@@ -44,7 +44,7 @@ int main(void)
 			exit_status = execute(args);
 		else
 		{
-			perror("./hsh");
+			perror("Error");
 			free(args);
 			continue;
 		}
@@ -86,14 +86,6 @@ char *search_path(char *command)
 			_strcat(path_concat, "/");
 			_strcat(path_concat, command);
 		}
-		else
-{
-	path_concat = malloc(_strlen(path_split[i]) + _strlen(command) + 1);
-	if (!path_concat)
-		return (NULL);
-	_strcpy(path_concat, path_split[i]);
-	_strcat(path_concat, command);
-}
 	if (stat(path_concat, &info) == 0)
 {
 		break;
