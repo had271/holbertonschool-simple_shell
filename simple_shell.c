@@ -17,7 +17,7 @@ int main(void)
 		if (isatty(0))
 			printf("hsh$ ");
 
-		buff_size = getline(&buff, &read_size, stdin);
+		buff_size = _getline(&buff, &read_size);
 		if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
 		{
 			break;
