@@ -37,11 +37,13 @@ $
 
 Handle command lines with arguments.
 **Example:**
+```bash
 ($) /bin/ls -l /tmp
 total 0
 -rw------- 1 user user 0 Jan 20 14:33 file1
 -rw------- 1 user user 0 Jan 20 14:33 file2
 ($)
+```
 
 ## 10. Simple shell 0.2.1
 
