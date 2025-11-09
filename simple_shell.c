@@ -11,7 +11,6 @@ int main(void)
 	size_t read_size = 0;
 	ssize_t buff_size = 0;
 	int exit_status = 0;
-	int allocated = 0;
 
 	while (1)
 	{
