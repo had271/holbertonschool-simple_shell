@@ -46,10 +46,10 @@ char *_strcpy(char *dest, char *src)
 
 char **_split(char *str, char *sep)
 {
-	char *aux, **split_str;
+	char **split_str;
+	char *p = str;
 	int i = 0;
 
-	aux = strtok(str, sep);
 	split_str = (char **)_calloc(100, sizeof(char *));
 
 	if (!split_str)
@@ -58,13 +58,22 @@ char **_split(char *str, char *sep)
 		return (NULL);
 	}
 
-	while (aux)
+	while (*p)
 	{
-		split_str[i] = aux;
-		aux = strtok(NULL, sep);
-		i++;
+		while (*p && strchr(sep, *p))
+			p++;
+		if (!*p)
+			break;
+		split_str[i++] = p;
+		while (*p && !strchr(sep, *p))
+			p++;
+		if (*p)
+		{
+			*p = '\0';
+			p++;
+		}
 	}
-	split_str[i] = NULL;
+	split_str[i] = NULL;		
 	return (split_str);
 }
 
