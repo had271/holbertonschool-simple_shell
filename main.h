@@ -24,5 +24,5 @@ int execute(char **args);
 int empty_line(char *buff);
 extern char **environ;
 void *_calloc(unsigned int nmemb, unsigned int size);
-ssize_t _getline(char **lineptr, size_t *n)
+ssize_t _getline(char **lineptr, size_t *n);
 #endif
