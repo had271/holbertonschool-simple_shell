@@ -25,4 +25,5 @@ int empty_line(char *buff);
 extern char **environ;
 void *_calloc(unsigned int nmemb, unsigned int size);
 ssize_t _getline(char **lineptr, size_t *n);
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 #endif
