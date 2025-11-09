@@ -143,10 +143,11 @@ char *_getenv(char *env_var)
 {
     int i = 0;
     size_t len;
-    int j, match;
+    size_t j;
+    int match;
 
     if (env_var == NULL)
-    	return (NULL);
+        return (NULL);
 
     len = _strlen(env_var);
 
