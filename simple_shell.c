@@ -15,7 +15,8 @@ int main(void)
 
 	while (1)
 	{
-	if (isatty(0))
+	allocated = -1;
+		if (isatty(0))
 	printf("hsh$ ");
 
 	buff_size = getline(&buff, &read_size, stdin);
@@ -142,26 +143,21 @@ int execute(char **args)
 	* @env_var: env variable
 	* Return: env variable result, its content
 	*/
-
 char *_getenv(char *env_var)
 {
-	int i = 0, j;
-	int status;
+	int i = 0;
+	size_t len;
 
+	if (env_var == NULL)
+		return (NULL);
+	len = _strlen(env_var);
 	while (environ[i])
 	{
-	status = 1;
-
-	for (j = 0; environ[i][j] != '='; j++)
-	{
-	if (environ[i][j] != env_var[j])
-	status = 0;
+		if (strncmp(environ[i], env_var, len) == 0 && environ[i][len] == '=')
+			return (&environ[i][len + 1]);
+		i++;
 	}
-	if (status == 1)
-	break;
-	i++;
-	}
-	return (&environ[i][j + 1]);
+	return (NULL);
 }
 
 /**
