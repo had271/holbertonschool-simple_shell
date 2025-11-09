@@ -13,16 +13,18 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 
 ## Usage
 **Interactive mode**
-$ ./hsh
+``` $ ./hsh
 ($) /bin/ls
 main.c shell.c test_folder
 ($) exit
 $
+```
 
 **Non-interactive mode**
-$ echo "/bin/ls" | ./hsh
+```$ echo "/bin/ls" | ./hsh
 main.c shell.c test_folder
 $
+```
 
 ## Features
 - Display a prompt and wait for user input
@@ -50,32 +52,38 @@ total 0
 Handle the PATH.
 fork must not be called if the command doesn’t exist.
 **Example:**
+```
 ($) ls /var
 log tmp
 ($) ls nonexistent
 ./hsh: No such file or directory
 ($)
-
+```
 # 11. Simple shell 0.4.1
 
 Implement the exit built-in command.
 **Usage:**
+```
 ($) exit
 $
+```
 
 # 19. Comments
 
 Handle comments (#) in the input.
 Everything after # on a line is ignored.
 **Example:**
+```
 ($) ls # this is a comment
 main.c shell.c
 ($)
+```
 
 # 22. File as input
 
 Allow the shell to execute commands from a file.
 **Example:**
+```
 $ cat testfile
 /bin/ls
 /bin/pwd
@@ -83,4 +91,5 @@ $ ./hsh testfile
 main.c shell.c
 /home/user/simple_shell
 $
+```
 
