@@ -141,19 +141,33 @@ int execute(char **args)
 	*/
 char *_getenv(char *env_var)
 {
-	int i = 0;
-	size_t len;
+    int i = 0;
+    size_t len;
+    int j, match;
 
-	if (env_var == NULL)
-		return (NULL);
-	len = _strlen(env_var);
-	while (environ[i])
-	{
-		if (strncmp(environ[i], env_var, len) == 0 && environ[i][len] == '=')
-			return (&environ[i][len + 1]);
-		i++;
-	}
-	return (NULL);
+    if (env_var == NULL)
+    	return (NULL);
+
+    len = _strlen(env_var);
+
+    while (environ[i])
+    {
+        match = 1;
+        for (j = 0; j < len; j++)
+        {
+            if (environ[i][j] != env_var[j])
+            {
+                match = 0;
+                break;
+            }
+        }
+
+        if (match == 1 && environ[i][len] == '=')
+            return (&environ[i][len + 1]);
+
+        i++;
+    }
+    return (NULL);
 }
 
 /**
