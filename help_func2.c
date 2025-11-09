@@ -56,3 +56,86 @@ ssize_t _getline(char **lineptr, size_t *n)
 		}
 	}
 }
+
+/**
+ * _setenv - initialize or modify environment variable
+ * @var: variable name
+ * @value: variable value
+ * Return: 0 on success, -1 on failure
+ */
+int _setenv(char *var, char *value)
+{
+	int i = 0, len;
+	char *new_env;
+	
+	if (!var || !value)
+	{
+		write(2, "setenv: invalid arguments\n", 26);
+		return (-1);
+	}
+
+	len = _strlen(var);
+
+	while (environ[i])
+	{
+		if (_strncmp(environ[i], var, len) == 0 && environ[i][len] == '=')
+		{
+			new_env = malloc(len + _strlen(value) + 2);
+			if (!new_env)
+				return (-1);
+
+			_strcpy(new_env, var);
+			_strcat(new_env, "=");
+			_strcat(new_env, value);
+			environ[i] = new_env;
+			return (0);
+		}
+		i++;
+	}
+
+	environ = _realloc(environ, sizeof(char *) * (i + 2));
+	if (!environ)
+		return (-1);
+
+	new_env = malloc(len + _strlen(value) + 2);
+	if (!new_env)
+		return (-1);
+
+	_strcpy(new_env, var);
+	_strcat(new_env, "=");
+	_strcat(new_env, value);
+
+	environ[i] = new_env;
+	environ[i + 1] = NULL;
+	return (0);
+}
+/**
+ * _unsetenv - remove an environment variable
+ * @var: variable name to remove
+ * Return: 0 always
+ */
+int _unsetenv(char *var)
+{
+	int i = 0, j, len;
+
+	if (!var)
+	{
+		write(2, "unsetenv: invalid arguments\n", 28);
+		return (-1);
+	}
+
+	len = _strlen(var);
+
+	while (environ[i])
+	{
+		if (_strncmp(environ[i], var, len) == 0 && environ[i][len] == '=')
+		{
+			for (j = i; environ[j]; j++)
+				environ[j] = environ[j + 1];
+
+			return (0);
+		}
+		i++;
+	}
+	return (0);
+}
