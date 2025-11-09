@@ -51,28 +51,33 @@ char **_split(char *str, char *sep)
 	int i = 0;
 
 	split_str = (char **)_calloc(100, sizeof(char *));
-
 	if (!split_str)
 	{
 		free(split_str);
 		return (NULL);
 	}
 
-	while (*p)
+	while (str[i] != '\0')
 	{
-		while (*p && strchr(sep, *p))
-			p++;
-		if (!*p)
-			break;
-		split_str[i++] = p;
-		while (*p && !strchr(sep, *p))
-			p++;
-		if (*p)
-		{
-			*p = '\0';
-			p++;
-		}
+		for (j = 0; sep[j] != '\0'; j++)
+			if (str[i] == sep[j])
+			{ i++; start = i; j = -1; }
+		while (str[i] != '\0')
+			for (j = 0; sep[j] != '\0'; j++)
+				if (str[i] == sep[j])
+					break;
+			if (sep[j] != '\0')
+				break;
+			i++;
 	}
+		if (i > start)
+		{
+			str[i] = '\0';
+			split_str[k++] = &str[start];
+			i++;
+			start = i;
+		}
+}
 	split_str[i] = NULL;		
 	return (split_str);
 }
