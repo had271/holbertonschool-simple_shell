@@ -46,59 +46,52 @@ char *_strcpy(char *dest, char *src)
 
 char **_split(char *str, char *sep)
 {
-    char **split_str;
-    char *temp;
-    int i = 0, j = 0, start = 0, k = 0;
+	char **split_str;
+	int i = 0, j, start = 0, k = 0;
 
-    temp = malloc(_strlen(str) + 1);
-    if (!temp)
-        return (NULL);
-    _strcpy(temp, str);
+	split_str = _calloc(100, sizeof(char *));
+	if (!split_str)
+		return (NULL);
 
-    split_str = _calloc(100, sizeof(char *));
-    if (!split_str)
-    {
-        free(temp);
-        return (NULL);
-    }
+	while (str[i] != '\0')
+	{
 
-    str = temp;
+		while (str[i] != '\0')
+		{
+			for (j = 0; sep[j] != '\0'; j++)
+				if (str[i] == sep[j])
+					break;
+			if (sep[j] == '\0')
+				break;
+			i++;
+			start = i;
+		}
 
-    while (str[i] != '\0')
-    {
-        for (j = 0; sep[j] != '\0'; j++)
-        {
-            if (str[i] == sep[j])
-            {
-                i++;
-                start = i;
-                j = -1;
-            }
-        }
+		if (str[i] == '\0')
+			break;
 
-        while (str[i] != '\0')
-        {
-            for (j = 0; sep[j] != '\0'; j++)
-                if (str[i] == sep[j])
-                    break;
-            if (sep[j] != '\0')
-                break;
-            i++;
-        }
+		while (str[i] != '\0')
+		{
+			for (j = 0; sep[j] != '\0'; j++)
+				if (str[i] == sep[j])
+					break;
+			if (sep[j] != '\0')
+				break;
+			i++;
+		}
 
-        if (i > start)
-        {
-            str[i] = '\0';
-            split_str[k++] = &str[start];
-            i++;
-            start = i;
-        }
-    }
-    split_str[k] = NULL;
+		split_str[k++] = &str[start];
 
-    return (split_str);
+		if (str[i] == '\0')
+			break;
+
+		str[i] = '\0';
+		i++;
+		start = i;
+	}
+	split_str[k] = NULL;
+	return (split_str);
 }
-
 /**
  * _strcat - function that concatenates two strings
  * @dest: string
