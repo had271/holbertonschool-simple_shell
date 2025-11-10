@@ -83,50 +83,50 @@ ssize_t _getline(char **lineptr, size_t *n)
  */
 int _setenv(char *var, char *value)
 {
-	int i = 0, len;
-	char *new_env;
-	
-	if (!var || !value)
-	{
-		write(2, "setenv: invalid arguments\n", 26);
-		return (-1);
-	}
+    int i = 0;
+    size_t len;
+    char *new_val;
 
-	len = _strlen(var);
+    if (!var || !value)
+        return (-1);
 
-	while (environ[i])
-	{
-		if (_strncmp(environ[i], var, len) == 0 && environ[i][len] == '=')
-		{
-			new_env = malloc(len + _strlen(value) + 2);
-			if (!new_env)
-				return (-1);
+    len = _strlen(var);
 
-			_strcpy(new_env, var);
-			_strcat(new_env, "=");
-			_strcat(new_env, value);
-			environ[i] = new_env;
-			return (0);
-		}
-		i++;
-	}
+    while (environ[i])
+    {
+        if (_strncmp(environ[i], var, len) == 0 && environ[i][len] == '=')
+        {
+            free(environ[i]);
+            new_val = malloc(len + _strlen(value) + 2);
+            if (!new_val)
+                return (-1);
 
-	environ = _realloc(environ, sizeof(char *) * i, sizeof(char *) * (i + 2));
-	if (!environ)
-		return (-1);
+            _strcpy(new_val, var);
+            _strcat(new_val, "=");
+            _strcat(new_val, value);
 
-	new_env = malloc(len + _strlen(value) + 2);
-	if (!new_env)
-		return (-1);
+            environ[i] = new_val;
+            return (0);
+        }
+        i++;
+    }
+    environ = _realloc(environ, sizeof(char *) * (i + 2), sizeof(char *) * (i + 3));
+    if (!environ)
+        return (-1);
 
-	_strcpy(new_env, var);
-	_strcat(new_env, "=");
-	_strcat(new_env, value);
+    new_val = malloc(len + _strlen(value) + 2);
+    if (!new_val)
+        return (-1);
 
-	environ[i] = new_env;
-	environ[i + 1] = NULL;
-	return (0);
+    _strcpy(new_val, var);
+    _strcat(new_val, "=");
+    _strcat(new_val, value);
+
+    environ[i] = new_val;
+    environ[i + 1] = NULL;
+    return (0);
 }
+
 /**
  * _unsetenv - remove an environment variable
  * @var: variable name to remove
