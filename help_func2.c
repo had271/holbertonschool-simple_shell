@@ -104,6 +104,7 @@ int _setenv(char *var, char *value)
             _strcat(new_val, "=");
             _strcat(new_val, value);
 
+			free(environ[i]); 
             environ[i] = new_val;
             return (0);
         }
