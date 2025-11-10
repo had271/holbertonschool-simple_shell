@@ -41,7 +41,7 @@ void myshell_loop(void)
 			free(args);
 			free(usercommand);
 		}
-		return (0);
+		return;
 	}
 	else
 	{
