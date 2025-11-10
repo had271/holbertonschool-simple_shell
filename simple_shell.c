@@ -47,18 +47,18 @@ void myshell_loop(void)
 	{
 		do {
 		printf("($)");
-		user_command = read_command();
-		while (*user_command == '\0') 
+		usercommand = read_command();
+		while (*usercommand == '\0') 
 		{
-			free(user_command);
+			free(usercommand);
 			printf("($)");
-			user_command = read_command();
+			usercommand = read_command();
 		}
-		args = split_into_arguments(user_command);
+		args = split_into_arguments(usercommand);
 		if (args == NULL)
 		break;
 		shell_status = myshell_execute(args);
-		free(user_command);
+		free(usercommand);
 		free(args);
 		if (shell_status == 2)
 		exit(EXIT_SUCCESS);
@@ -82,7 +82,7 @@ char **split_into_arguments(char *line)
 		perror("#cisfun$ failed to allocate memory\n");
 		return (NULL);
 	}
-	tok = strtok(line, " \t\n\r\a");
+	toke = strtok(line, " \t\n\r\a");
 	if (toke == NULL)
 	{
 		free(commands);
