@@ -43,15 +43,13 @@ char *_getenv(const char *name)
 
 int _getchar(void)
 {
-	char charbuf[1];
-	int a;
+	char b;
+	ssize_t r;
 
-	a = read(0, charbuf, 1);
-
-	if (a < 1)
-	perror("read failed");
-
-return (charbuf[0]);
+	r = read(STDIN_FILENO, &b, 1);
+	if (r <= 0)
+		return (EOF);
+	return ((unsigned char)b);
 }
 
 /**
@@ -62,48 +60,56 @@ return (charbuf[0]);
  * Return: number of characters
 */
 
-ssize_t _getline(char **line, ssize_t *line_size, FILE *stream)
+ssize_t _getline(char **linep, ssize_t *line_size, FILE *stream)
 {
 	char *buffer;
-	ssize_t chars = 0, character;
+	ssize_t chars = 0;
+	ssize_t size;
 
-	buffer = malloc(sizeof(char) * (*line_size));
-
+	if (!linep || !line_size || !stream)
+		return (-1);
+	size = *line_size;
+	if (size <= 0) size = 32;
+	buffer = malloc(size);
 	if (!buffer)
 	{
-		perror("#cisfun$: memory allocation error\n");
-		exit(EXIT_FAILURE);
+		perror("malloc");
+		return (-1);
 	}
-	*line = buffer;
-	while (1 & (stream == stdin))
+	while (1)
 	{
-		fflush(stdout);
-		character = _getchar();
-
-		if (character == EOF || character == '\n')
+		int c = _getchar();
+		if (c == EOF)
+		{
+			if (chars == 0)
+			{
+				free(buffer);
+				return (-1);
+			}
+			buffer[chars] = '\0';
+			break;
+		}
+		if (c == '\n')
 		{
 			buffer[chars] = '\0';
 			break;
 		}
-
-		else
+		buffer[chars++] = (char)c;
+		if (chars >= size)
 		{
-			buffer[chars] = character;
-			chars++;
-		}
-
-		if (chars >= *line_size)
-		{
-			*line_size += 32;
-			buffer = _realloc(buffer, *line_size, *line_size * sizeof(char));
+			ssize_t old_size = size;
+			size += 32;
+			buffer = _realloc(buffer, (unsigned int)old_size, (unsigned int)size);
 			if (!buffer)
 			{
-				perror("#cisfun$: memory allocation error\n");
-				exit(EXIT_FAILURE);
+				perror("realloc");
+				return (-1);
 			}
 		}
 	}
-return (chars);
+	*linep = buffer;
+	*line_size = size;
+	return (chars);
 }
 
 /**
@@ -156,4 +162,5 @@ void free_double_pointer(char **dirs)
 		free(dirs[i]);
 	free(dirs);
 }
+
 
