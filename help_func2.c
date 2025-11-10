@@ -1,4 +1,22 @@
 #include "main.h"
+/**
+ * _strncmp - compare n characters of 2 strings
+ * @s1: first string
+ * @s2: second string
+ * @n: number of chars to compare
+ * Return: difference or 0 if equal
+*/
+int _strncmp(char *s1, char *s2, int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        if (s1[i] != s2[i] || s1[i] == '\0' || s2[i] == '\0')
+            return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+    }
+    return (0);
+}
 
 /**
  * _getline - custom getline implementation
