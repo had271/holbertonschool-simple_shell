@@ -121,19 +121,15 @@ ssize_t _getline(char **linep, ssize_t *line_size, FILE *stream)
 
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
-	void *tmp;
-	unsigned int i, j;
+	unsigned int i;
+	char *tmp;
+	char *old_ptr;
 
 	if (new_size == old_size)
 		return (ptr);
 	if (ptr == NULL)
-	{
-		tmp = malloc(new_size);
-		if (tmp == NULL)
-			return (NULL);
-		return (tmp);
-	}
-	if (new_size == 0)
+		return (malloc(new_size));
+	if (new_size == 0 && ptr != NULL)
 	{
 		free(ptr);
 		return (NULL);
@@ -141,8 +137,9 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 	tmp = malloc(new_size);
 	if (tmp == NULL)
 		return (NULL);
+	old_ptr = (char *)ptr;
 	for (i = 0; i < old_size && i < new_size; i++)
-			tmp[i] = ((char *)ptr)[i];
+		tmp[i] = old_ptr[i];
 	free(ptr);
 	return (tmp);
 }
@@ -161,6 +158,7 @@ void free_double_pointer(char **dirs)
 		free(dirs[i]);
 	free(dirs);
 }
+
 
 
 
