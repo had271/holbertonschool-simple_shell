@@ -36,6 +36,26 @@ int main(void)
 		exit_status = 0;
 		continue;
 		}
+		if (_strncmp(buff, "setenv", 6) == 0)
+		{
+    		args = _split(buff, " ");
+    		if (args[1] && args[2])
+        		_setenv(args[1], args[2]);
+    		else
+				write(2, "Usage: setenv VARIABLE VALUE\n", 29);
+			free(args);
+			continue;
+		}
+		if (_strncmp(buff, "unsetenv", 8) == 0)
+		{
+			args = _split(buff, " ");
+    		if (args[1])
+        		_unsetenv(args[1]);
+    		else
+				write(2, "Usage: unsetenv VARIABLE\n", 25);
+			free(args);
+			continue;
+		}
 		args = _split(buff, " ");
 		orig0 = args[0];
 		args[0] = search_path(args[0]);
