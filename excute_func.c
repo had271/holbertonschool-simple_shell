@@ -8,21 +8,19 @@
 
 int myshell_execute(char **args)
 {
-	int i = 0, counter = 0;
+	int i = 0;
+	int builtin_count = 4;
 	char *builtin_name[] = {"cd", "exit", "env", "help"};
-
 	int (*builtin_func[]) (char **) = {&myshell_cd, &myshell_exit, &myshell_env, &myshell_help};
-	if (args == NULL)
-	return (1);
-	counter = sizeof(builtin_name) / sizeof(char *);
-	while (i < counter)
+
+	if (!args || !args[0])
+		return (1);
+	for (i = 0; i < builtin_count; i++)
 	{
 		if (_strcmp(args[0], builtin_name[i]) == 0)
-		return (builtin_func[i](args));
-		i++;
+			return (builtin_func[i](args));
 	}
-
-return (myshell_external(args));
+	return (myshell_external(args));
 }
 
 /**
@@ -34,46 +32,54 @@ return (myshell_external(args));
 
 int myshell_external(char **args)
 {
-	char *path = NULL, *env_PATH, **directories = NULL, *directories_cpy;
-	int i, j;
+	char *env_PATH = NULL;
+	char **directories = NULL;
+	pid_t child_pid = -1;
+	int found = 0;
 
-	env_PATH = _getenv("PATH");
-	directories = split_path(env_PATH);
-	free(env_PATH);
-	for (j = 0; directories[j]; j++)
+	if (!args || !args[0])
+		return (1);
+	if (strchr(args[0], '/'))
 	{
-		if (_strncmp(args[0], directories[j], _strlen(directories[j])) == 0)
+		if (access(args[0], X_OK) == 0)
 		{
-			path = args[0];
-			if (access(path, X_OK) != 0)
-			return (no_exec_found(directories));
-			_execve(path, args);
-			return (wait_free_directories(directories));
+			child_pid = _execve(args[0], args);
+			return (wait_free_directories(child_pid, NULL));
+		}
+		else
+		{
+			return (no_exec_found(NULL));
 		}
 	}
-	for (i = 0; directories[i]; i++)
+	env_PATH = _getenv("PATH");
+	if (!env_PATH)
 	{
-		directories_cpy = malloc(1024 * sizeof(char));
-		if (directories_cpy == NULL)
-		{
-			perror("hsh: failed to allocate directories_cpy\n");
-			break;
-		} _strcpy(directories_cpy, directories[i]);
-		_strcat(directories_cpy, args[0]);
-		path = directories_cpy;
-		if (access(path, X_OK) != 0)
-		free(directories_cpy);
-		else
-		break;
+		return (no_exec_found(NULL));
 	}
-if (!directories[i])
-{
-	if (execve(args[0], args, environ) == -1)
+	directories = split_path(env_PATH);
+	free(env_PATH);
+	for (int i = 0; directories && directories[i]; i++)
+	{
+		size_t need = _strlen(directories[i]) + _strlen(args[0]) + 1;
+		char *candidate = malloc(need);
+		if (!candidate)
+		{
+			perror("malloc");
+			no_exec_found(directories);
+			return (1);
+		}
+		_strcpy(candidate, directories[i]);
+		_strcat(candidate, args[0]);
+		if (access(candidate, X_OK) == 0)
+		{
+			child_pid = _execve(candidate, args);
+			free(candidate);
+			found = 1;
+			return (wait_free_directories(child_pid, directories));
+		}
+		free(candidate);
+	}
 	return (no_exec_found(directories));
-	return (1);
-} _execve(path, args);
-free(path);
-return (wait_free_directories(directories));
 }
 
 /**
@@ -84,17 +90,18 @@ return (wait_free_directories(directories));
 
 int wait_free_directories(char **directories)
 {
-	int wait_status, i;
+	int status, i;
 
-	wait(&wait_status);
-
-	for (i = 0; directories[i]; i++)
+	if (child_pid > 0)
+		waitpid(child_pid, &status, 0);
+	else
+		wait(&status);
+	if (directories)
 	{
-		free(directories[i]);
+		for (i = 0; directories[i]; i++)
+			free(directories[i]);
+		free(directories);
 	}
-
-	free(directories);
-
 return (1);
 }
 
@@ -106,8 +113,13 @@ return (1);
 
 int no_exec_found(char **directories)
 {
-	perror("cisfun");
-	free_double_pointer(directories);
+	write(STDERR_FILENO, "hsh: command not found\n", 23);
+	if (directories)
+	{
+		for (int i = 0; directories[i]; i++)
+			free(directories[i]);
+		free(directories);
+	}
 	return (1);
 }
 
@@ -123,20 +135,18 @@ int _execve(char *path, char **args)
 	pid_t pid;
 
 	pid = fork();
+	if (pid == -1)
+	{
+			perror("fork");
+			return (-1);
+	}
 	if (pid == 0)
 	{
-		if (execve(path, args, environ) == -1)
-		{
-			perror("cisfun");
-			return (0);
-		}
+		execve(path, args, environ);
+		perror("execve");
+		exit(EXIT_FAILURE);
 	}
-	else if (pid < 0)
-	{
-		perror("cisfun");
-		return (0);
-	}
-
-return (1);
+	return ((int)pid);
 }
+
 
