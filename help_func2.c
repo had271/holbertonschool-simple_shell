@@ -8,14 +8,17 @@
 
 int myshell_cd(char **args)
 {
-	if (args == NULL)
-	write(STDOUT_FILENO, "Please enter a command\n", 23);
-	else if (chdir(args[1]) != 0)
+	if (args == NULL || args[1] == NULL)
 	{
-		perror("cisfun");
-		exit(EXIT_FAILURE);
+		write(STDOUT_FILENO, "Please enter a command\n", 23);
+		return (1);
 	}
-return (1);
+	if (chdir(args[1]) != 0)
+	{
+		perror("cd");
+		return (1);
+	}
+	return (1);
 }
 
 /**
@@ -44,16 +47,11 @@ return (1);
 
 int myshell_help(__attribute__((unused)) char **args)
 {
-	write(STDOUT_FILENO, "Help list \n", 13);
-	write(STDOUT_FILENO, "cd - change the current directory\n", 36);
-	write(STDOUT_FILENO, "  exit - cause normal process termination\n", 42);
-	write(STDOUT_FILENO, "  help - display useful information\n", 36);
-	write(STDOUT_FILENO, "  cp - copy files and directories\n", 35);
-	write(STDOUT_FILENO, " clear - clear the terminal screen\n", 36);
-	write(STDOUT_FILENO, " cat - print on the standard output\n", 37);
-	write(STDOUT_FILENO, " echo - display a line of text\n", 31);
-	write(STDOUT_FILENO, "  mkdir - create a new folder\n", 30);
-return (1);
+	write(STDOUT_FILENO, "Help list \n", 11);
+	write(STDOUT_FILENO, "cd - change the current directory\n", 33);
+	write(STDOUT_FILENO, "exit - cause normal process termination\n", 39);
+	write(STDOUT_FILENO, "help - display useful information\n", 33);
+	return (1);
 }
 
 /**
@@ -78,12 +76,19 @@ char *read_command(void)
 	size_t line_size = 0;
 	char *line = NULL;
 
-	line = malloc(sizeof(char) * line_size);
-	if (getline(&line, &line_size, stdin) == EOF)
+#if defined(_GNU_SOURCE)
+	if (getline(&line, &line_size, stdin) == -1)
 	{
 		free(line);
 		exit(0);
 	}
-return (line);
+#else
+	if (_getline(&line, (ssize_t *)&line_size, stdin) == -1)
+	{
+		free(line);
+		exit(0);
+	}
+#endif
+	return (line);
 }
 
