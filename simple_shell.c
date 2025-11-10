@@ -1,215 +1,165 @@
 #include "main.h"
 
 /**
-	* main - open shell, project base
-	* Return: int
-	*/
-
+ * main - my own shell
+ * Return: always 0, success
+*/
 int main(void)
 {
-	char *buff = NULL, **args, *orig0;
-	size_t read_size = 0;
-	ssize_t buff_size = 0;
-	int exit_status = 0;
+	myshell_loop();
 
-	while (1)
-	{
-		if (isatty(0))
-			printf("hsh$ ");
-
-		buff_size = _getline(&buff, &read_size);
-		if (buff_size == -1 || _strcmp("exit\n", buff) == 0)
-		{
-			break;
-		}
-
-		buff[buff_size - 1] = '\0';
-
-		if (_strcmp("env", buff) == 0)
-		{
-		_env();
-		continue;
-		}
-
-		if (empty_line(buff) == 1)
-		{
-		    exit_status = 0;
-		    continue;
-		}
-		
-		args = _split(buff, " ");
-		
-		if (_strcmp(args[0], "setenv") == 0)
-		{
-		    if (args[1] && args[2])
-		        _setenv(args[1], args[2]);
-		    else
-		        write(2, "Usage: setenv VARIABLE VALUE\n", 29);
-		    free(args);
-		    continue;
-		}
-		
-		if (_strcmp(args[0], "unsetenv") == 0)
-		{
-		    if (args[1])
-		        _unsetenv(args[1]);
-		    else
-		        write(2, "Usage: unsetenv VARIABLE\n", 25);
-		    free(args);
-		    continue;
-		}
-		
-		if (_strcmp(args[0], "cd") == 0)
-		{
-		    change_dir(args);
-		    free(args);
-		    continue;
-		}
-		args = _split(buff, " ");
-		orig0 = args[0];
-		args[0] = search_path(args[0]);
-		if (args[0] == NULL)
-		{
-		perror("./hsh");
-		free(args);
-		continue;
-		}
-
-		exit_status = execute(args);
-		if (args[0] != orig0)
-			free(args[0]);
-		free(args);
-		}
-	free(buff);
-	return (exit_status);
-}
-
-char *search_path(char *command)
-{
-	char *path = _getenv("PATH"), *path_cpy;
-	char **path_split;
-	char *path_concat = NULL;
-	int i = 0, path_len = 0;
-	struct stat info;
-
-	if (stat(command, &info) == 0)
-	return (command);
-
-	if (!path)
-	return (NULL);
-
-	path_cpy = malloc(_strlen(path) + 1);
-	if (!path_cpy)
-	return (NULL);
-
-	_strcpy(path_cpy, path);
-	path_split = _split(path_cpy, ":");
-	if (!path_split)
-	{
-	free(path_cpy);
-	return (NULL);
-	}
-
-	while (path_split[i])
-	{
-	path_len = _strlen(path_split[i]);
-	path_concat = malloc(path_len + _strlen(command) + 2);
-	if (!path_concat)
-	{
-	i++;
-	continue;
-	}
-
-	_strcpy(path_concat, path_split[i]);
-	_strcat(path_concat, "/");
-	_strcat(path_concat, command);
-
-	if (stat(path_concat, &info) == 0)
-	break;
-
-	free(path_concat);
-	path_concat = NULL;
-	i++;
-	}
-
-	free(path_cpy);
-	free(path_split);
-
-	return (path_concat);
+return (0);
 }
 
 /**
-	* execute - execute command path, child process
-	* @args: arguments
-	* Return: exit status
-	*/
-
-int execute(char **args)
+ * sig_handler - Function to happen when SINGIN is detected by signal
+ * @signal: integer
+*/
+void sig_handler(int signal)
 {
-	int id = fork(), status;
+	if (signal == SIGINT)
+	write(1, "\n($)", 4);
+}
 
-	if (id == 0)
+/**
+ * myshell_loop - function that will mantain my shell running
+*/
+void myshell_loop(void)
+{
+	char *usercommand, **args;
+	int shell_status;
+
+	if (signal(SIGINT, sig_handler) == SIG_ERR)
+	perror("cisfun");
+	if (isatty(STDIN_FILENO) != 1)
 	{
-	if (execve(args[0], args, environ) == -1)
-	perror("Error");
+		while (1)
+		{
+			usercommand = read_command();
+			args = split_into_arguments(usercommand);
+			myshell_execute(args);
+			free(args);
+			free(usercommand);
+		}
+		return;
 	}
 	else
 	{
-	wait(&status);
-	if (WIFEXITED(status))
-	status = WEXITSTATUS(status);
+		do {
+		printf("($)");
+		user_command = read_command();
+		while (*user_command == '\0') 
+		{
+			free(user_command);
+			printf("($)");
+			user_command = read_command();
+		}
+		args = split_into_arguments(user_command);
+		if (args == NULL)
+		break;
+		shell_status = myshell_execute(args);
+		free(user_command);
+		free(args);
+		if (shell_status == 2)
+		exit(EXIT_SUCCESS);
+		} while (shell_status);
 	}
-
-	return (status);
 }
 
 /**
-	* _getenv - get env variables
-	* @env_var: env variable
-	* Return: env variable result, its content
-	*/
-char *_getenv(char *env_var)
-{
-    int i = 0;
-    size_t len;
-    size_t j;
-    int match;
-
-    if (env_var == NULL)
-        return (NULL);
-
-    len = _strlen(env_var);
-
-    while (environ[i])
-    {
-        match = 1;
-        for (j = 0; j < len; j++)
-        {
-            if (environ[i][j] != env_var[j])
-            {
-                match = 0;
-                break;
-            }
-        }
-
-        if (match == 1 && environ[i][len] == '=')
-            return (&environ[i][len + 1]);
-
-        i++;
-    }
-    return (NULL);
-}
-
-/**
-	* _env - prints environment
+ * split_into_arguments - function to splite the line
+ * @line: Pointer
+ * Return: Pointer
 */
-void _env(void)
+char **split_into_arguments(char *line)
 {
-	int i = 0;
+	int i, commands_size = 32;
+	char **commands, *toke = NULL;
 
-	while (environ[i])
+	commands = malloc(commands_size * sizeof(char *));
+	if (commands == NULL)
 	{
-	printf("%s\n", environ[i]);
-	i++;
+		perror("#cisfun$ failed to allocate memory\n");
+		return (NULL);
 	}
+	tok = strtok(line, " \t\n\r\a");
+	if (toke == NULL)
+	{
+		free(commands);
+		return (NULL);
+	}
+	else
+	{
+		i = 0;
+		while (toke != NULL)
+		{
+			commands[i] = toke;
+			toke = strtok(NULL, " \n");
+			i++;
+
+			if (i >= commands_size)
+			{
+				commands_size += 1024;
+				commands = _realloc(commands, commands_size,
+										commands_size * sizeof(char *));
+				if (commands == NULL)
+				{
+					perror("#cisfun$ failed to realloc commands\n");
+					return (NULL);
+				}
+			}
+		}
+		commands[i] = NULL;
+	}
+return (commands);
+}
+
+
+/**
+ * split_path - function to split env variable PATH into tokens
+ * @path: pointer
+ * Return: Pointer
+*/
+char **split_path(char *path)
+{
+	unsigned int i;
+	char *toke = NULL, **dir;
+	size_t dir_size = 32;
+
+	dir = malloc(sizeof(char *) * dir_size);
+	if (dir == NULL)
+	{
+		perror("split_path: failed to allocate dir\n");
+		exit(EXIT_FAILURE);
+	} toke = strtok(path, "= :");
+	toke = strtok(NULL, "= :");
+	if (toke == NULL)
+	{
+		free(dir);
+		perror(" enter a path\n");
+		exit(EXIT_FAILURE);
+	} else
+	{
+		i = 0;
+		while (toke != NULL)
+		{
+			dir[i] = malloc(sizeof(char) * (_strlen(toke) + 2));
+			if (dir[i] == NULL)
+			{
+				free(dir);
+				perror("#cisfun$ failed to allocate dir[i]\n");
+				exit(EXIT_FAILURE);
+			} _strcpy(dir[i], toke);
+			_strcat(dir[i], "/");
+			toke = strtok(NULL, "= :");
+			i++;
+			if (i >= dir_size)
+			{
+				dir_size += 32;
+				dir = _realloc(dir, dir_size, dir_size * sizeof(char *));
+				if (dir == NULL)
+				perror("#cisfun$ failed to reallocate dir\n");
+			}
+		} dir[i] = NULL;
+	} return (dir);
 }
