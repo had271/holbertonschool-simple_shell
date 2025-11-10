@@ -1,33 +1,40 @@
 #ifndef MAIN_H
 #define MAIN_H
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 #include <signal.h>
-#include <errno.h>
-#include <dirent.h>
-int main(void);
-int BettBett(void);
-int _strcmp(char *s1, char *s2);
-char *_strcpy(char *dest, char *src);
-char *search_path(char *command);
-char **_split(char *str, char *sep);
-char *_strcat(char *dest, char *src);
-int _strlen(char *s);
-char *_getenv(char *env_var);
-void _env(void);
-int execute(char **args);
-int empty_line(char *buff);
 extern char **environ;
-void *_calloc(unsigned int nmemb, unsigned int size);
-ssize_t _getline(char **lineptr, size_t *n);
+int BettBett(void);
+int main(void);
+int _getchar(void);
+ssize_t _getline(char **linep, ssize_t *line_size, FILE *stream);
+void sig_handler(int signal);
+char *read_command(void);
+char **split_into_arguments(char *line);
+void myshell_loop(void);
+int myshell_execute(char **args);
+int myshell_external(char **args);
+int myshell_cd(char **args);
+int myshell_exit(char **args);
+int myshell_env(char **args);
+int myshell_help(char **args);
+char *_getenv(const char *name);
+char **split_path(char *path);
+int _execve(char *path, char **args);
+void free_double_pointer(char **dirs);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-int _unsetenv(char *var);
-int _setenv(char *var, char *value);
-int _strncmp(char *s1, char *s2, int n);
-int change_dir(char **args);
+unsigned int _getpid(void);
+int no_exec_found(char **directories);
+int _strncmp(const char *s1, const char *s2, int n);
+char *_strcat(char *dest, char *src);
+char *_strcpy(char *dest, char *src);
+size_t _strlen(const char *s);
+int _strcmp(char *s1, char *s2);
+int wait_free_directories(char **directories);
 #endif
