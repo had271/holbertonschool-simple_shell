@@ -96,7 +96,6 @@ int _setenv(char *var, char *value)
     {
         if (_strncmp(environ[i], var, len) == 0 && environ[i][len] == '=')
         {
-            free(environ[i]);
             new_val = malloc(len + _strlen(value) + 2);
             if (!new_val)
                 return (-1);
