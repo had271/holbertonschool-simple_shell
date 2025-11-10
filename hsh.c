@@ -7,8 +7,7 @@
 int main(void)
 {
 	myshell_loop();
-
-return (0);
+	return (0);
 }
 
 /**
@@ -26,44 +25,55 @@ void sig_handler(int signal)
 */
 void myshell_loop(void)
 {
-	char *usercommand, **args;
-	int shell_status;
+	char *usercommand = NULL, **args = NULL;
+	int shell_status = 1;
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
-	perror("cisfun");
-	if (isatty(STDIN_FILENO) != 1)
+		perror("signal");
+	if (!isatty(STDIN_FILENO))
 	{
 		while (1)
 		{
 			usercommand = read_command();
+			if (!usercommand) break;
 			args = split_into_arguments(usercommand);
 			myshell_execute(args);
 			free(args);
 			free(usercommand);
 		}
-		return;
+		return (0);
 	}
 	else
 	{
 		do {
-		printf("($)");
-		usercommand = read_command();
-		while (*usercommand == '\0') 
-		{
-			free(usercommand);
 			printf("($)");
+			fflush(stdout);
 			usercommand = read_command();
-		}
-		args = split_into_arguments(usercommand);
-		if (args == NULL)
-		break;
-		shell_status = myshell_execute(args);
-		free(usercommand);
-		free(args);
-		if (shell_status == 2)
-		exit(EXIT_SUCCESS);
+			if (!usercommand)
+				break;
+			while (usercommand[0] == '\0')
+			{
+				free(usercommand);
+				printf("($)");
+				fflush(stdout);
+				usercommand = read_command();
+				if (!usercommand) break;
+			}
+			if (!usercommand) break;
+			args = split_into_arguments(usercommand);
+			if (args == NULL)
+			{
+				free(usercommand);
+				continue;
+			}
+			shell_status = myshell_execute(args);
+			free(args);
+			free(usercommand);
+			if (shell_status == 2)
+				exit(EXIT_SUCCESS);
 		} while (shell_status);
 	}
+	return (0);
 }
 
 /**
@@ -74,44 +84,42 @@ void myshell_loop(void)
 char **split_into_arguments(char *line)
 {
 	int i, commands_size = 32;
-	char **commands, *toke = NULL;
+	char **commands, *toke;
+	int old_count;
 
+	if (!line)
+		return (NULL);
 	commands = malloc(commands_size * sizeof(char *));
-	if (commands == NULL)
+	if (!commands)
 	{
-		perror("#cisfun$ failed to allocate memory\n");
+		perror("malloc commands");
 		return (NULL);
 	}
 	toke = strtok(line, " \t\n\r\a");
-	if (toke == NULL)
+	if (!toke)
 	{
 		free(commands);
 		return (NULL);
 	}
-	else
+	while (toke)
 	{
-		i = 0;
-		while (toke != NULL)
+		commands[i++] = toke;
+		if (i >= commands_size)
 		{
-			commands[i] = toke;
-			toke = strtok(NULL, " \n");
-			i++;
-
-			if (i >= commands_size)
+			old_count = command_size;
+			commands_size += 1024;
+			commands = _realloc(commands, old_count * sizeof(char *),
+				commands_size * sizeof(char *));
+			if (!commands)
 			{
-				commands_size += 1024;
-				commands = _realloc(commands, commands_size,
-										commands_size * sizeof(char *));
-				if (commands == NULL)
-				{
-					perror("#cisfun$ failed to realloc commands\n");
-					return (NULL);
-				}
+				perror("realloc commands");
+				return (NULL);
 			}
 		}
-		commands[i] = NULL;
+		toke = strtok(NULL, " \t\n\r\a");
 	}
-return (commands);
+	commands[i] = NULL;
+	return (commands);
 }
 
 
@@ -122,44 +130,51 @@ return (commands);
 */
 char **split_path(char *path)
 {
-	unsigned int i;
-	char *toke = NULL, **dir;
-	size_t dir_size = 32;
+	char *toke;
+	char **dirs;
+	size_t dirs_count = 32;
+	size_t i = 0;
 
-	dir = malloc(sizeof(char *) * dir_size);
-	if (dir == NULL)
+	if (path_value == NULL)
+		return (NULL);
+
+	dirs = malloc(sizeof(char *) * dirs_count);
+	if (!dirs)
 	{
-		perror("split_path: failed to allocate dir\n");
+		perror("split_path: malloc");
 		exit(EXIT_FAILURE);
-	} toke = strtok(path, "= :");
-	toke = strtok(NULL, "= :");
-	if (toke == NULL)
+	}
+
+	toke = strtok(path_value, ":");
+	while (toke != NULL)
 	{
-		free(dir);
-		perror(" enter a path\n");
-		exit(EXIT_FAILURE);
-	} else
-	{
-		i = 0;
-		while (toke != NULL)
+		size_t len = _strlen(toke);
+
+		dirs[i] = malloc(len + 2);
+		if (!dirs[i])
 		{
-			dir[i] = malloc(sizeof(char) * (_strlen(toke) + 2));
-			if (dir[i] == NULL)
+			perror("split_path: malloc dir");
+			for (size_t k = 0; k < i; k++) free(dirs[k]);
+			free(dirs);
+			exit(EXIT_FAILURE);
+		}
+		_strcpy(dirs[i], toke);
+		if (dirs[i][len - 1] != '/')
+			_strcat(dirs[i], "/");
+		i++;
+		if (i >= dirs_count)
+		{
+			dirs_count += 32;
+			dirs = _realloc(dirs, (unsigned int)(dirs_count - 32) * sizeof(char *),
+							(unsigned int)dirs_count * sizeof(char *));
+			if (!dirs)
 			{
-				free(dir);
-				perror("#cisfun$ failed to allocate dir[i]\n");
+				perror("split_path: realloc failed");
 				exit(EXIT_FAILURE);
-			} _strcpy(dir[i], toke);
-			_strcat(dir[i], "/");
-			toke = strtok(NULL, "= :");
-			i++;
-			if (i >= dir_size)
-			{
-				dir_size += 32;
-				dir = _realloc(dir, dir_size, dir_size * sizeof(char *));
-				if (dir == NULL)
-				perror("#cisfun$ failed to reallocate dir\n");
 			}
-		} dir[i] = NULL;
-	} return (dir);
+		}
+		toke = strtok(NULL, ":");
+	}
+	dirs[i] = NULL;
+	return (dirs);
 }
