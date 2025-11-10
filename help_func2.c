@@ -111,7 +111,7 @@ int _setenv(char *var, char *value)
 		i++;
 	}
 
-	environ = _realloc(environ, sizeof(char *) * (i + 2));
+	environ = _realloc(environ, sizeof(char *) * i, sizeof(char *) * (i + 2));
 	if (!environ)
 		return (-1);
 
