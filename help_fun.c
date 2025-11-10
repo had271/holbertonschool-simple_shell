@@ -47,11 +47,22 @@ char *_strcpy(char *dest, char *src)
 char **_split(char *str, char *sep)
 {
     char **split_str;
+    char *temp;
     int i = 0, j = 0, start = 0, k = 0;
+
+    temp = malloc(_strlen(str) + 1);
+    if (!temp)
+        return (NULL);
+    _strcpy(temp, str);
 
     split_str = _calloc(100, sizeof(char *));
     if (!split_str)
+    {
+        free(temp);
         return (NULL);
+    }
+
+    str = temp;
 
     while (str[i] != '\0')
     {
@@ -83,10 +94,10 @@ char **_split(char *str, char *sep)
             start = i;
         }
     }
-	split_str[k] = NULL;
+    split_str[k] = NULL;
+
     return (split_str);
 }
-
 
 /**
  * _strcat - function that concatenates two strings
