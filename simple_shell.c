@@ -56,6 +56,13 @@ int main(void)
 			free(args);
 			continue;
 		}
+		if (_strncmp(buff, "cd", 2) == 0)
+		{
+			args = _split(buff, " ");
+    		change_dir(args);
+    		free(args);
+    		continue;
+		}
 		args = _split(buff, " ");
 		orig0 = args[0];
 		args[0] = search_path(args[0]);
