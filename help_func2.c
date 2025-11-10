@@ -157,3 +157,46 @@ int _unsetenv(char *var)
 	}
 	return (0);
 }
+/**
+ * change_dir - handles builtin cd command and directory switching
+ * @args: command and arguments
+ * Return: 1 on success, 0 on failure
+ */
+
+int change_dir(char **args)
+{
+    char cwd[1024];
+    char *target;
+
+    if (args[1] == NULL)
+    {
+        target = _getenv("HOME");
+        if (!target)
+            return (0);
+    }
+    else if (_strcmp(args[1], "-") == 0)
+    {
+        target = _getenv("OLDPWD");
+        if (!target)
+            return (0);
+
+        write(1, target, _strlen(target));
+        write(1, "\n", 1);
+    }
+    else
+        target = args[1];
+
+    if (chdir(target) == -1)
+    {
+        perror("cd");
+        return (0);
+    }
+
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        _setenv("OLDPWD", _getenv("PWD"));
+        _setenv("PWD", cwd);
+    }
+
+    return (1);
+}
