@@ -75,7 +75,7 @@ int myshell_exit(__attribute__((unused)) char **args)
 
 char *read_command(void)
 {
-	size_t line_size = 32;
+	size_t line_size = 0;
 	char *line = NULL;
 
 	line = malloc(sizeof(char) * line_size);
@@ -86,3 +86,4 @@ char *read_command(void)
 	}
 return (line);
 }
+
