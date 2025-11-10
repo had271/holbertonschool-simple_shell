@@ -35,7 +35,6 @@ char *_getenv(const char *name)
 	}
 	return (NULL);
 }
-}
 /**
  * _getchar - function to get a character from STDIN
  * Return: the character
@@ -162,5 +161,6 @@ void free_double_pointer(char **dirs)
 		free(dirs[i]);
 	free(dirs);
 }
+
 
 
