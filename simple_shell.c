@@ -33,35 +33,37 @@ int main(void)
 
 		if (empty_line(buff) == 1)
 		{
-		exit_status = 0;
-		continue;
+		    exit_status = 0;
+		    continue;
 		}
-		if (_strncmp(buff, "setenv", 6) == 0)
+		
+		args = _split(buff, " ");
+		
+		if (_strcmp(args[0], "setenv") == 0)
 		{
-    		args = _split(buff, " ");
-    		if (args[1] && args[2])
-        		_setenv(args[1], args[2]);
-    		else
-				write(2, "Usage: setenv VARIABLE VALUE\n", 29);
-			free(args);
-			continue;
+		    if (args[1] && args[2])
+		        _setenv(args[1], args[2]);
+		    else
+		        write(2, "Usage: setenv VARIABLE VALUE\n", 29);
+		    free(args);
+		    continue;
 		}
-		if (_strncmp(buff, "unsetenv", 8) == 0)
+		
+		if (_strcmp(args[0], "unsetenv") == 0)
 		{
-			args = _split(buff, " ");
-    		if (args[1])
-        		_unsetenv(args[1]);
-    		else
-				write(2, "Usage: unsetenv VARIABLE\n", 25);
-			free(args);
-			continue;
+		    if (args[1])
+		        _unsetenv(args[1]);
+		    else
+		        write(2, "Usage: unsetenv VARIABLE\n", 25);
+		    free(args);
+		    continue;
 		}
-		if (_strncmp(buff, "cd", 2) == 0)
+		
+		if (_strcmp(args[0], "cd") == 0)
 		{
-			args = _split(buff, " ");
-    		change_dir(args);
-    		free(args);
-    		continue;
+		    change_dir(args);
+		    free(args);
+		    continue;
 		}
 		args = _split(buff, " ");
 		orig0 = args[0];
