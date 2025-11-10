@@ -28,4 +28,5 @@ ssize_t _getline(char **lineptr, size_t *n);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 int _unsetenv(char *var);
 int _setenv(char *var, char *value);
+int _strncmp(char *s1, char *s2, int n);
 #endif
