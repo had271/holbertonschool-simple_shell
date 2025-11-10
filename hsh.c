@@ -16,8 +16,8 @@ int main(void)
 */
 void sig_handler(int signal)
 {
-	if (signal == SIGINT)
-	write(1, "\n($)", 4);
+	(void)signal;
+	write(STDOUT_FILENO, "\n($) ", 5);
 }
 
 /**
