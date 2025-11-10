@@ -86,6 +86,7 @@ int _setenv(char *var, char *value)
     int i = 0;
     size_t len;
     char *new_val;
+	char **new_env;
 
     if (!var || !value)
         return (-1);
@@ -109,9 +110,7 @@ int _setenv(char *var, char *value)
             return (0);
         }
         i++;
-    }
-    char **new_env;
-	
+    }	
 	new_env = _realloc(environ, sizeof(char *) * (i + 2), sizeof(char *) * (i + 3));
 	if (!new_env)
 		return (-1);
