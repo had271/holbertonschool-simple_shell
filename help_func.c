@@ -8,48 +8,34 @@
 
 char *_getenv(const char *name)
 {
-	char **envir;
-	char *buffer;
-	size_t buf_size = 1024, path_len;
+	size_t name_len;
+	char **env;
+	char *entry;
 
 	if (name == NULL)
 	{
-		perror("#cisfun$: enter a valid env\n");
-		exit(EXIT_FAILURE);
+		return (NULL);
 	}
-
-	envir = environ;
-	buffer = malloc(sizeof(char) * buf_size);
-	if (!buffer)
+	name_len = _strlen(name);
+	for (env = environ; env && *env; env++)
 	{
-		perror("#cisfun$:");
-		exit(EXIT_FAILURE);
-	}
-
-	while (*envir)
-	{
-		if (_strncmp(*envir, name, _strlen(name)) == 0)
+		entry = *env;
+		if (_strncmp(entry, name, (int)name_len) == 0 && entry[name_len] == '=')
 		{
-			path_len = _strlen(*envir);
-
-			if (path_len >= buf_size)
+			char *value = entry + name_len + 1;
+			char *ret = malloc(_strlen(value) + 1);
+			if (!ret)
 			{
-				buffer = realloc(buffer, buf_size);
-				if (!buffer)
-				{
-					free(buffer);
-					perror("#cisfun$: failed allocating memory");
-					exit(EXIT_FAILURE);
-				}
+				perror("malloc");
+				return (NULL);
 			}
-			_strcpy(buffer, *envir);
-			break;
+			_strcpy(ret, value);
+			return (ret);
 		}
-		envir++;
 	}
-return (buffer);
+	return (NULL);
 }
-
+}
 /**
  * _getchar - function to get a character from STDIN
  * Return: the character
@@ -142,35 +128,20 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 			return (NULL);
 		return (tmp);
 	}
-	if ((new_size == 0) && (ptr != NULL))
+	if (new_size == 0)
 	{
 		free(ptr);
 		return (NULL);
 	}
-	if (new_size > old_size)
-	{
-		tmp = malloc(new_size);
-		if (tmp == NULL)
-			return (NULL);
-		for (i = 0; i < old_size; i++)
-			((char *)tmp)[i] = ((char *)ptr)[i];
-		free(ptr);
-		return (tmp);
-	}
-	else
-	{
-		tmp = malloc(new_size);
-		if (tmp == NULL)
-			return (NULL);
-		for (j = 0; j < new_size; j++)
-		{
-			((char *)tmp)[j] = ((char *)ptr)[j];
-		}
-		free(ptr);
-		return (tmp);
-	}
-	return (NULL);
+	tmp = malloc(new_size);
+	if (tmp == NULL)
+		return (NULL);
+	for (i = 0; i < old_size && i < new_size; i++)
+			tmp[i] = ((char *)ptr)[i];
+	free(ptr);
+	return (tmp);
 }
+	
 
 /**
  * free_double_pointer - function to free a pointer
@@ -179,11 +150,10 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 
 void free_double_pointer(char **dirs)
 {
-	int i;
-
-	for (i = 0; dirs[i]; i++)
-	{
+	if (!dirs)
+		return;
+	for (int i = 0; dirs[i]; i++)
 		free(dirs[i]);
-	}
 	free(dirs);
 }
+
