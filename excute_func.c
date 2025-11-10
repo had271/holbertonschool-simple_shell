@@ -35,7 +35,6 @@ int myshell_external(char **args)
 	char *env_PATH = NULL;
 	char **directories = NULL;
 	pid_t child_pid = -1;
-	int found = 0;
 	int i;
 	
 	if (!args || !args[0])
@@ -149,6 +148,7 @@ int _execve(char *path, char **args)
 	}
 	return ((int)pid);
 }
+
 
 
 
