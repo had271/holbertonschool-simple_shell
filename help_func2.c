@@ -110,9 +110,10 @@ int _setenv(char *var, char *value)
         }
         i++;
     }
-    environ = _realloc(environ, sizeof(char *) * (i + 2), sizeof(char *) * (i + 3));
-    if (!environ)
-        return (-1);
+    char **new_env = _realloc(environ, sizeof(char *) * (i + 2), sizeof(char *) * (i + 3));
+	if (!new_env)
+		return (-1);
+	environ = new_env;
 
     new_val = malloc(len + _strlen(value) + 2);
     if (!new_val)
