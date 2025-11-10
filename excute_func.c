@@ -36,7 +36,8 @@ int myshell_external(char **args)
 	char **directories = NULL;
 	pid_t child_pid = -1;
 	int found = 0;
-
+	int i;
+	
 	if (!args || !args[0])
 		return (1);
 	if (strchr(args[0], '/'))
@@ -58,7 +59,7 @@ int myshell_external(char **args)
 	}
 	directories = split_path(env_PATH);
 	free(env_PATH);
-	for (int i = 0; directories && directories[i]; i++)
+	for (i = 0; directories && directories[i]; i++)
 	{
 		size_t need = _strlen(directories[i]) + _strlen(args[0]) + 1;
 		char *candidate = malloc(need);
@@ -88,7 +89,7 @@ int myshell_external(char **args)
  * Return: 1, always success
 */
 
-int wait_free_directories(char **directories)
+int wait_free_directories(pid_t child_pid, char **directories)
 {
 	int status, i;
 
@@ -148,5 +149,6 @@ int _execve(char *path, char **args)
 	}
 	return ((int)pid);
 }
+
 
 
