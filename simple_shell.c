@@ -40,8 +40,10 @@ int main(void)
 		{
     		args = _split(buff, " ");
     		if (args[1] && args[2])
+			{
         		_setenv(args[1], args[2]);
 				_env();
+			}
     		else
 				write(2, "Usage: setenv VARIABLE VALUE\n", 29);
 			free(args);
@@ -51,8 +53,10 @@ int main(void)
 		{
 			args = _split(buff, " ");
     		if (args[1])
+			{
         		_unsetenv(args[1]);
 				_env();
+			}
     		else
 				write(2, "Usage: unsetenv VARIABLE\n", 25);
 			free(args);
