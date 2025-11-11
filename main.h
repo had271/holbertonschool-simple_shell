@@ -20,4 +20,5 @@ char *cmd_with_slash(char *cmd);
 int parse_command(char *line, char *args[]);
 int handle_builtins(char *args[], char *line, char **envp, int *status);
 int execute_command(char *args[], char **envp);
+int handle_exit(char **args, int last_status);
 #endif
