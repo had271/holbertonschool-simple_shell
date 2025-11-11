@@ -42,7 +42,7 @@ int handle_builtins(char *args[], char *line, char **envp, int *status)
 	if (strcmp(args[0], "exit") == 0)
 	{
 	free(line);
-	exit(*status);
+	handle_exit(args, *status);
 	}
 
 	if (strcmp(args[0], "env") == 0)
@@ -121,6 +121,7 @@ int is_executable(char *path)
 {
 	return (access(path, X_OK) == 0);
 }
+
 
 
 
