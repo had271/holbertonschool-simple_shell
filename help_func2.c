@@ -94,6 +94,8 @@ int handle_exit(char **args, int last_status)
     int status;
     char *endptr;
 
+	long num = strtol(args[1], &endptr, 10);
+	
     if (args[1] == NULL) {
         exit(last_status);
     }
@@ -120,5 +122,6 @@ int is_executable(char *path)
 {
 	return (access(path, X_OK) == 0);
 }
+
 
 
