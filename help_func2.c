@@ -93,12 +93,14 @@ int handle_exit(char **args, int last_status)
 {
     int status;
     char *endptr;
-
-	long num = strtol(args[1], &endptr, 10);
-	
+    long num;
+    
     if (args[1] == NULL) {
         exit(last_status);
-    }    
+    }
+    
+    num = strtol(args[1], &endptr, 10);
+    
     if (*endptr != '\0' || args[1][0] == '\0') {
         fprintf(stderr, "./hsh: 1: exit: Illegal number: %s\n", args[1]);
         return (2); 
@@ -119,6 +121,7 @@ int is_executable(char *path)
 {
 	return (access(path, X_OK) == 0);
 }
+
 
 
 
