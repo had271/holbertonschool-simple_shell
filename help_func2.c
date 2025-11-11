@@ -95,6 +95,7 @@ void handle_exit(char *args[], char *line, int status)
 	free(line);
 	exit(status);
 	}
+}
 
 /**
  * is_executable - checks if a file is executable
@@ -105,5 +106,4 @@ void handle_exit(char *args[], char *line, int status)
 int is_executable(char *path)
 {
 	return (access(path, X_OK) == 0);
-}
 }
