@@ -10,6 +10,16 @@
 #include <signal.h>
 extern char **environ;
 int BettBett(void);
+int _isspace(char *s);
+char *trim(char *str);
+int is_executable(char *path);
+char *get_path_env(char **envp);
+char *find_command(char *cmd, char **envp);
+char *try_cmd_path(char *dir, char *cmd);
+char *cmd_with_slash(char *cmd);
+int parse_command(char *line, char *args[]);
+int handle_builtins(char *args[], char *line, char **envp, int *status);
+int execute_command(char *args[], char **envp);
 int main(void);
 int _getchar(void);
 ssize_t _getline(char **linep, ssize_t *line_size, FILE *stream);
@@ -36,4 +46,5 @@ char *_strcpy(char *dest, char *src);
 size_t _strlen(const char *s);
 int _strcmp(char *s1, char *s2);
 int wait_free_directories(char **directories);
+
 #endif
