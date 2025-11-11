@@ -1,164 +1,163 @@
 #include "main.h"
 
 /**
- * _getenv - function to get an enviroment variable
- * @name: pointer
- * Return: pointer
-*/
-
-char *_getenv(const char *name)
+	* execute_command - executes an external command
+	* @args: tokenized command
+	* @envp: environment variables
+	*
+	* Return: exit status of the command
+	*/
+int execute_command(char *args[], char **envp)
 {
-	size_t name_len;
-	char **env;
-	char *entry;
+	pid_t pid;
+	int status;
+	char *path_cmd;
 
-	if (name == NULL)
+	path_cmd = find_command(args[0], envp);
+	if (!path_cmd)
 	{
+	write(STDERR_FILENO, "./hsh: 1: ", 10);
+	write(STDERR_FILENO, args[0], strlen(args[0]));
+	write(STDERR_FILENO, ": not found\n", 12);
+	return (127);
+	}
+
+	pid = fork();
+	if (pid == -1)
+	{
+	perror("fork");
+	free(path_cmd);
+	return (1);
+	}
+	else if (pid == 0)
+	{
+	execve(path_cmd, args, envp);
+	perror("execve");
+	_exit(EXIT_FAILURE);
+	}
+	else
+	{
+	wait(&status);
+	free(path_cmd);
+	if (WIFEXITED(status))
+	return (WEXITSTATUS(status));
+	return (1);
+	}
+}
+
+/**
+	* try_cmd_path - checks if cmd exists in a given directory
+	* @dir: directory path
+	* @cmd: command name
+	*
+	* Return: full path string (malloced) if executable, NULL otherwise
+	*/
+char *try_cmd_path(char *dir, char *cmd)
+{
+	char *full_path;
+
+	full_path = malloc(strlen(dir) + strlen(cmd) + 2);
+	if (!full_path)
 		return (NULL);
-	}
-	name_len = _strlen(name);
-	for (env = environ; env && *env; env++)
-	{
-		entry = *env;
-		if (_strncmp(entry, name, (int)name_len) == 0 && entry[name_len] == '=')
-		{
-			char *value = entry + name_len + 1;
-			char *ret = malloc(_strlen(value) + 1);
-			if (!ret)
-			{
-				perror("malloc");
-				return (NULL);
-			}
-			_strcpy(ret, value);
-			return (ret);
-		}
-	}
+
+	sprintf(full_path, "%s/%s", dir, cmd);
+
+	if (access(full_path, X_OK) == 0)
+		return (full_path);
+
+	free(full_path);
 	return (NULL);
 }
-/**
- * _getchar - function to get a character from STDIN
- * Return: the character
-*/
-
-int _getchar(void)
-{
-	char b;
-	ssize_t r;
-
-	r = read(STDIN_FILENO, &b, 1);
-	if (r <= 0)
-		return (EOF);
-	return ((unsigned char)b);
-}
 
 /**
- * _getline - getline function
- * @line: pointer
- * @line_size: pointer
- * @stream: pointer
- * Return: number of characters
-*/
-
-ssize_t _getline(char **linep, ssize_t *line_size, FILE *stream)
+	* cmd_with_slash - checks if cmd contains '/' and is executable
+	* @cmd: command
+	*
+	* Return: malloced path if executable, NULL otherwise
+	*/
+char *cmd_with_slash(char *cmd)
 {
-	char *buffer;
-	ssize_t chars = 0;
-	ssize_t size;
+	char *full_path;
 
-	if (!linep || !line_size || !stream)
-		return (-1);
-	size = *line_size;
-	if (size <= 0) size = 32;
-	buffer = malloc(size);
-	if (!buffer)
-	{
-		perror("malloc");
-		return (-1);
-	}
-	while (1)
-	{
-		int c = _getchar();
-		if (c == EOF)
-		{
-			if (chars == 0)
-			{
-				free(buffer);
-				return (-1);
-			}
-			buffer[chars] = '\0';
-			break;
-		}
-		if (c == '\n')
-		{
-			buffer[chars] = '\0';
-			break;
-		}
-		buffer[chars++] = (char)c;
-		if (chars >= size)
-		{
-			ssize_t old_size = size;
-			size += 32;
-			buffer = _realloc(buffer, (unsigned int)old_size, (unsigned int)size);
-			if (!buffer)
-			{
-				perror("realloc");
-				return (-1);
-			}
-		}
-	}
-	*linep = buffer;
-	*line_size = size;
-	return (chars);
-}
-
-/**
-  * _realloc -  function to realloc space of memory
-  * @ptr: pointer
-  * @old_size: size
-  * @new_size: size
-  * Return: new string
-  */
-
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
-{
-	unsigned int i;
-	char *tmp;
-	char *old_ptr;
-
-	if (new_size == old_size)
-		return (ptr);
-	if (ptr == NULL)
-		return (malloc(new_size));
-	if (new_size == 0 && ptr != NULL)
-	{
-		free(ptr);
+	if (!cmd || !strchr(cmd, '/'))
 		return (NULL);
-	}
-	tmp = malloc(new_size);
-	if (tmp == NULL)
+
+	if (access(cmd, X_OK) != 0)
 		return (NULL);
-	old_ptr = (char *)ptr;
-	for (i = 0; i < old_size && i < new_size; i++)
-		tmp[i] = old_ptr[i];
-	free(ptr);
-	return (tmp);
+
+	full_path = malloc(strlen(cmd) + 1);
+	if (!full_path)
+		return (NULL);
+
+	strcpy(full_path, cmd);
+	return (full_path);
 }
-	
 
 /**
- * free_double_pointer - function to free a pointer
- * @directories: pointer
-*/
-
-void free_double_pointer(char **dirs)
+	* find_command - finds the full path of a command
+	* @cmd: the command to find
+	* @envp: environment variables
+	*
+	* Return: full path string (malloced) or NULL if not found
+	*/
+char *find_command(char *cmd, char **envp)
 {
-	if (!dirs)
-		return;
-	for (int i = 0; dirs[i]; i++)
-		free(dirs[i]);
-	free(dirs);
+	char *path_env, *path_dup, *dir, *full_path;
+
+	if (!cmd)
+		return (NULL);
+
+	full_path = cmd_with_slash(cmd);
+	if (full_path)
+		return (full_path);
+
+	path_env = get_path_env(envp);
+	if (!path_env || path_env[0] == '\0')
+		return (NULL);
+
+	path_dup = malloc(strlen(path_env) + 1);
+	if (!path_dup)
+		return (NULL);
+	strcpy(path_dup, path_env);
+
+	dir = strtok(path_dup, ":");
+	while (dir)
+	{
+		full_path = try_cmd_path(dir, cmd);
+		if (full_path)
+		{
+			free(path_dup);
+			return (full_path);
+		}
+		dir = strtok(NULL, ":");
+	}
+
+	free(path_dup);
+	return (NULL);
 }
 
+/**
+	* trim - removes leading and trailing spaces and tabs from a string
+	* @str: the string to trim
+	*
+	* Return: pointer to the trimmed string, or NULL if str is NULL
+	*/
+char *trim(char *str)
+{
+	char *end;
 
+	if (!str)
+		return (NULL);
 
+	while (*str == ' ' || *str == '\t')
+	str++;
 
+	if (*str == 0)
+	return (str);
+
+	end = str + strlen(str) - 1;
+	while (end > str && (*end == ' ' || *end == '\t'))
+	*end-- = '\0';
+
+	return (str);
+}
